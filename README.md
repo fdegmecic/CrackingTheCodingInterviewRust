@@ -1,1 +1,1 @@
-solutions to Cracking The Coding Interview 6th edition in Rust
+learning rust by solving Cracking The Coding Interview 6th edition 🦀

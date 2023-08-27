@@ -1,17 +1,6 @@
+//1.1 - Is Unique
 #![allow(dead_code)]
 use std::{collections::HashSet, vec};
-
-fn has_unique_brute_force(string: &str) -> bool {
-    for char1 in string.chars() {
-        for char2 in string.chars() {
-            if char1 == char2 {
-                return false;
-            }
-        }
-    }
-
-    true
-}
 
 fn has_unqiue_hash_set(string: &str) -> bool {
     string.chars().into_iter().collect::<HashSet<_>>().len() == string.len()
@@ -83,7 +72,7 @@ fn has_unique_bit_manipulation(string: &str) -> bool {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use crate::chapter1::q1::*;
 
     #[test]
