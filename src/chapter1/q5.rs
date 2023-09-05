@@ -2,33 +2,14 @@
 #![allow(dead_code)]
 
 fn is_one_away(str1: &str, str2: &str) -> bool {
-    if str1.len() == str2.len() {
-        one_edit_replace(str1, str2)
-    } else if str1.len() + 1 == str2.len() {
-        one_edit_insert(str1, str2)
-    } else if str1.len() - 1 == str2.len() {
-        one_edit_insert(str2, str1)
-    } else {
-        false
-    }
+    if ((str1.len() as i32) - (str2.len() as i32)).abs() > 1 {
+        return false;
+    };
+
+    one_edit_insert_replace(str1, str2)
 }
 
-fn one_edit_replace(str1: &str, str2: &str) -> bool {
-    let mut found_difference = false;
-    for i in 0..str1.len() {
-        if str1.chars().nth(i) != str2.chars().nth(i) {
-            if found_difference {
-                return false;
-            }
-
-            found_difference = true
-        }
-    }
-
-    true
-}
-
-fn one_edit_insert(str1: &str, str2: &str) -> bool {
+fn one_edit_insert_replace(str1: &str, str2: &str) -> bool {
     let (s, l) = get_ordered(str1, str2);
     let mut iter = 0;
 
@@ -37,7 +18,11 @@ fn one_edit_insert(str1: &str, str2: &str) -> bool {
 
     while iter < shorter.len() {
         if longer[iter] != shorter[iter] {
-            return longer[iter + 1..] == shorter[iter..];
+            let offset = match s.len() == l.len() {
+                true => 1,
+                false => 0,
+            };
+            return longer[iter + 1..] == shorter[iter + offset..];
         }
 
         iter += 1;
