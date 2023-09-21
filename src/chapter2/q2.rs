@@ -30,28 +30,23 @@ impl<T> LinkedList<T> {
     fn append(&mut self, value: T) {
         let new_node = Node::new(value);
 
-        match self.head.take() {
-            Some(old_head) => {
-                new_node.borrow_mut().next = Some(old_head.clone());
-            }
-            _ => {}
+        if let Some(last) = self.iter().last() {
+            last.as_ref().borrow_mut().next = Some(new_node)
+        } else {
+            self.head = Some(new_node);
         }
-
-        self.head = Some(new_node);
     }
 
     fn kth_to_last(&self, k: usize) -> Link<T> {
-        let mut p1 = self.iter().next();
+        let mut p1 = self.iter().skip(k).next();
         let mut p2 = self.head.clone();
 
         while let Some(node1) = p1 {
             p1 = node1.borrow().next.clone();
-            if let Some(node2) = p2 {
-                p2 = node2.borrow().next.clone();
-            }
+            p2 = p2?.borrow().next.clone();
         }
 
-        p1
+        p2
     }
 
     fn iter(&self) -> Iter<T> {
@@ -93,8 +88,7 @@ mod tests {
         list.append(5);
         list.append(6);
         list.append(7);
-        println!("{list:?}");
         let result = list.kth_to_last(3);
-        print!("{}", result.unwrap().borrow().value);
+        assert_eq!(result.unwrap().borrow().value, 5);
     }
 }
