@@ -1,4 +1,4 @@
-// 1.3 - Delete middle node
+// 2.3 - Delete middle node
 #![allow(dead_code)]
 
 use std::{

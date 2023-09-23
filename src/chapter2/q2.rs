@@ -1,4 +1,4 @@
-// 1.2 - Return kth to last
+// 2.2 - Return kth to last
 #![allow(dead_code)]
 
 use std::{cell::RefCell, rc::Rc};
