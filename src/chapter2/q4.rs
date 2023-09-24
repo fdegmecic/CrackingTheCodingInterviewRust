@@ -66,10 +66,7 @@ where
     fn partition_v2(&mut self, part_element: T) -> Self {
         self.part(|rc_ref| rc_ref.borrow().value < part_element)
             .iter()
-            .chain(
-                self.part(|rc_ref| rc_ref.borrow().value >= part_element)
-                    .iter(),
-            )
+            .chain(self.iter())
             .map(|rc| rc.borrow().value.clone())
             .collect()
     }

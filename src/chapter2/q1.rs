@@ -1,4 +1,4 @@
-// Chapter 2 - Remove Duplicates
+// 2.1 - Remove Duplicates
 #![allow(dead_code)]
 
 use std::cell::RefCell;
