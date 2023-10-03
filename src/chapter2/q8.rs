@@ -9,12 +9,13 @@ struct Node {
     next: Link,
     value: usize,
 }
+
 impl Node {
-    fn new(value: usize) -> Rc<RefCell<Node>> {
+    fn new(value: usize) -> Rc<RefCell<Self>> {
         Rc::new(RefCell::new(Node { next: None, value }))
     }
 
-    fn new_(value: usize, next: Link) -> Rc<RefCell<Node>> {
+    fn new_(value: usize, next: Link) -> Rc<RefCell<Self>> {
         Rc::new(RefCell::new(Node { next, value }))
     }
 }
@@ -47,12 +48,19 @@ impl LinkedList {
     }
 
     fn find_loop(&self) -> Link {
-        let (tortoise_iter, hare_iter) = (self.iter(), self.iter().step_by(2));
+        let (tortoise_iter, hare_iter) = (self.iter().skip(1), self.iter().skip(2).step_by(2));
 
         for (t, h) in tortoise_iter.zip(hare_iter) {
-            if Rc::ptr_eq(&t, &h) {}
-        }
+            if Rc::ptr_eq(&t, &h) {
+                let fast_iter = self.iter_from_node(h)?;
 
+                for (slow, fast) in self.iter().zip(fast_iter) {
+                    if Rc::ptr_eq(&slow, &fast) {
+                        return Some(fast);
+                    }
+                }
+            }
+        }
         None
     }
 
@@ -60,6 +68,16 @@ impl LinkedList {
         Iter {
             next: self.head.clone(),
         }
+    }
+
+    fn iter_from_node(&self, node: Rc<RefCell<Node>>) -> Option<Iter> {
+        for curr in self.iter() {
+            if Rc::ptr_eq(&curr, &node) {
+                return Some(Iter { next: Some(node) });
+            }
+        }
+
+        None
     }
 }
 
@@ -86,13 +104,9 @@ mod tests {
     fn should_find_loop() {
         let mut list = LinkedList::new();
         let node = Node::new(69);
-        let circular_linked_nodes = Node::new_(1, Some(Node::new_(3, Some(node.clone()))));
+        let circular_linked_nodes = Node::new_(3, Some(Node::new_(1, Some(node.clone()))));
         node.borrow_mut().next = Some(circular_linked_nodes);
 
-        list.append(1);
-        list.append(2);
-        list.append(3);
-        list.append(4);
         list.append(5);
         list.append(6);
         list.append(7);
@@ -100,5 +114,18 @@ mod tests {
         list.add_node(node);
 
         assert_eq!(69, list.find_loop().unwrap().borrow().value);
+    }
+
+    #[test]
+    fn should_not_find_loop() {
+        let mut list = LinkedList::new();
+
+        list.append(5);
+        list.append(6);
+        list.append(7);
+        list.append(8);
+        list.append(69);
+
+        assert!(list.find_loop().is_none());
     }
 }
