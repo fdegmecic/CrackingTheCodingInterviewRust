@@ -1,7 +1,11 @@
 // 3.3 - Stack of Plates
 #![allow(dead_code)]
 
-use std::{cell::RefCell, rc::Rc};
+use std::{
+    cell::RefCell,
+    fmt::{self, Display},
+    rc::Rc,
+};
 
 type Link = Option<Rc<RefCell<Node>>>;
 
@@ -22,7 +26,7 @@ impl Node {
 }
 
 struct SetOfStacks {
-    stacks: Vec<Stack>,
+    pub stacks: Vec<Stack>,
     capacity: usize,
 }
 
@@ -35,14 +39,51 @@ impl SetOfStacks {
     }
 
     fn push(&mut self, value: usize) {
-        let mut last = self.get_last_stack();
-
-        if last.is_some() && !last.unwrap().is_full() {
-        } else {
-            let mut stack = Stack::new(self.capacity);
-            stack.push(value);
-            self.stacks.push(stack)
+        match self.get_last_stack() {
+            Some(last) if !last.is_full() => {
+                last.push(value);
+            }
+            _ => {
+                let mut stack = Stack::new(self.capacity);
+                stack.push(value);
+                self.stacks.push(stack);
+            }
         }
+    }
+
+    fn pop(&mut self) -> Option<usize> {
+        let stack = self.get_last_stack()?;
+        let value = stack.pop();
+        if stack.is_empty() {
+            self.stacks.remove(self.stacks.len() - 1);
+        }
+
+        value
+    }
+
+    fn pop_at(&mut self, index: usize) -> Option<usize> {
+        self.left_shift(index)
+    }
+
+    fn left_shift(&mut self, index: usize) -> Option<usize> {
+        let mut removed_value = None;
+
+        if let Some(stack) = self.stacks.get_mut(index) {
+            removed_value = stack.pop();
+
+            if stack.is_empty() {
+                self.stacks.remove(index);
+            }
+        }
+
+        if self.stacks.len() > index + 1 {
+            let value = self.left_shift(index + 1);
+            if let Some(stack) = self.stacks.get_mut(index) {
+                stack.push(value.unwrap());
+            }
+        }
+
+        removed_value
     }
 
     fn get_last_stack(&mut self) -> Option<&mut Stack> {
@@ -54,7 +95,7 @@ struct Stack {
     capacity: usize,
     top: Link,
     bottom: Link,
-    size: usize,
+    pub size: usize,
 }
 
 impl Stack {
@@ -95,6 +136,43 @@ impl Stack {
         self.top = Some(new_node);
         true
     }
+
+    fn pop(&mut self) -> Option<usize> {
+        let top = self.top.take()?;
+
+        self.top = top.borrow().below.clone();
+        self.size -= 1;
+
+        return Some(top.borrow().value);
+    }
+
+    fn is_empty(&self) -> bool {
+        self.size == 0
+    }
+}
+
+impl Display for SetOfStacks {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        for (i, stack) in self.stacks.iter().enumerate() {
+            let mut current = stack.bottom.clone();
+            if i > 0 {
+                write!(f, ", ")?;
+            }
+            write!(f, "[")?;
+            while let Some(curr) = current {
+                write!(f, "{}", curr.borrow().value)?;
+
+                if let Some(next) = curr.borrow().above.clone() {
+                    write!(f, ", ")?;
+                    current = Some(next);
+                } else {
+                    break;
+                }
+            }
+            write!(f, "]")?;
+        }
+        write!(f, "")
+    }
 }
 
 #[cfg(test)]
@@ -104,5 +182,15 @@ mod tests {
     #[test]
     fn should_add_stacks() {
         let mut stacks = SetOfStacks::new(2);
+
+        stacks.push(1);
+        stacks.push(2);
+        stacks.push(3);
+        stacks.push(4);
+        stacks.push(5);
+        assert_eq!(format!("{}", stacks), "[1, 2], [3, 4], [5]");
+
+        stacks.pop_at(1);
+        assert_eq!(format!("{}", stacks), "[1, 2], [3, 5]");
     }
 }
