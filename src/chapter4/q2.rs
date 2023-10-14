@@ -5,13 +5,13 @@ use std::{cell::RefCell, rc::Rc};
 
 type Link = Rc<RefCell<BinaryNode>>;
 
-struct BinaryNode {
-    value: usize,
-    left: Option<Link>,
-    right: Option<Link>,
+pub struct BinaryNode {
+    pub value: usize,
+    pub left: Option<Link>,
+    pub right: Option<Link>,
 }
 
-fn create_minimal_tree(array: &[usize]) -> Option<Link> {
+pub fn create_minimal_tree(array: &[usize]) -> Option<Link> {
     r_create_minimal_tree(array)
 }
 
