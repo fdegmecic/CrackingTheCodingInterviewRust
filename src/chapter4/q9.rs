@@ -43,8 +43,8 @@ fn weave(left: &[usize], right: &[usize]) -> Vec<Vec<usize>> {
     let mut temp: Vec<usize> = Vec::new();
     let mut result: Vec<Vec<usize>> = Vec::new();
     r_weave(
-        &mut Vec::from(left.clone()),
-        &mut Vec::from(right.clone()),
+        &mut Vec::from(left),
+        &mut Vec::from(right),
         temp.as_mut(),
         result.as_mut(),
     );

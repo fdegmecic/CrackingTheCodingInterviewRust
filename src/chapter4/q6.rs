@@ -28,8 +28,6 @@ fn get_left_most_child(node: Option<Link>) -> Option<Link> {
 }
 
 fn get_parent(node: Link) -> Option<Link> {
-
-
     let node = node.clone();
     let parent = node.borrow().parent.clone();
 
@@ -38,7 +36,7 @@ fn get_parent(node: Link) -> Option<Link> {
             Some(parent)
         } else {
             get_parent(parent)
-        }
+        };
     }
 
     None
@@ -60,7 +58,6 @@ impl Iterator for LeftMostIter {
 }
 
 impl BinaryNode {
-
     fn new(value: usize) -> Link {
         Rc::new(RefCell::new(BinaryNode {
             value,
