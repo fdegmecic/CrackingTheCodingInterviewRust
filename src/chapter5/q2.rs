@@ -30,7 +30,7 @@ mod tests {
 
     #[test]
     fn should_print_decimal_to_binary() {
-        //assert_eq!(decimal_to_binary(0.5), "0.1".to_string());
+        assert_eq!(decimal_to_binary(0.5), "0.1".to_string());
         assert_eq!(decimal_to_binary(0.25), "0.01".to_string());
         assert_eq!(decimal_to_binary(0.125), "0.001".to_string());
         assert_eq!(decimal_to_binary(0.875), "0.111".to_string());
